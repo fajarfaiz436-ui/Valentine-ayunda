@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Valentine Clips 💖</title>
+  <style>
+    *{ box-sizing:border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    body{
+      margin:0;
+      height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      overflow:hidden;
+    }
+
+    .wrap{
+      width:min(420px, calc(100% - 32px));
+      background:#fff;
+      border-radius:28px;
+      padding:22px 18px 18px;
+      box-shadow:0 22px 50px rgba(0,0,0,0.18);
+      position:relative;
+    }
+
+    .top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:12px;
+    }
+
+    .badge{
+      font-size:12px;
+      padding:7px 12px;
+      border-radius:999px;
+      background:rgba(255, 77, 109, 0.12);
+      color:#ff4d6d;
+      font-weight:800;
+      letter-spacing:.3px;
+    }
+
+    .stage{
+      height:390px;
+      border-radius:22px;
+      background: radial-gradient(circle at top, rgba(255,77,109,.14), transparent 60%);
+      position:relative;
+      overflow:hidden;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:16px;
+    }
+
+    /* SCENES */
+    .scene{
+      position:absolute;
+      inset:0;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      gap:14px;
+      opacity:0;
+      transform:scale(.96);
+      pointer-events:none;
+    }
+
+    .scene.active{
+      opacity:1;
+      transform:scale(1);
+      pointer-events:auto;
+      transition: opacity .35s ease, transform .35s ease;
+    }
+
+    .title{
+      text-align:center;
+      font-size:28px;
+      font-weight:950;
+      line-height:1.1;
+      color:#ff4d6d;
+      text-transform:uppercase;
+      padding: 0 6px;
+    }
+
+    .subtitle{
+      text-align:center;
+      font-size:14px;
+      color:#444;
+      margin-top:-6px;
+    }
+
+    /* Sticker animation */
+    .sticker{
+      font-size:66px;
+      filter: drop-shadow(0 14px 18px rgba(0,0,0,.12));
+      animation: stickerPop .9s ease both;
+    }
+    @keyframes stickerPop{
+      0%{ transform: scale(0) rotate(-12deg); opacity:0; }
+      60%{ transform: scale(1.12) rotate(6deg); opacity:1; }
+      100%{ transform: scale(1) rotate(0deg); opacity:1; }
+    }
+
+    .pulse{ animation: pulse 1.2s ease-in-out infinite; }
+    @keyframes pulse{
+      0%,100%{ transform: scale(1); }
+      50%{ transform: scale(1.06); }
+    }
+
+    /* Buttons */
+    .btnRow{
+      position: relative;
+      width: 100%;
+      height: 140px;
+      margin-top: 6px;
+    }
+
+    button{
+      border:none;
+      cursor:pointer;
+      padding:12px 18px;
+      border-radius:999px;
+      font-size:15px;
+      font-weight:900;
+      box-shadow:0 10px 18px rgba(0,0,0,0.10);
+      transition: transform .2s ease;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button:active{ transform: scale(.98); }
+
+    .primary{ background:#ff4d6d; color:#fff; }
+    .ghost{ background:#f2f2f2; color:#333; }
+    .backBtn{
+      position:absolute;
+      left:14px;
+      top:14px;
+      background: rgba(0,0,0,0.06);
+      color:#333;
+      box-shadow:none;
+      padding:10px 14px;
+      font-size:13px;
+      font-weight:900;
+      border-radius:999px;
+    }
+
+    /* Clip 1 buttons */
+    #yesBtn{
+      position:absolute;
+      left:50%;
+      top:10px;
+      transform: translateX(-50%);
+    }
+    #noBtn{
+      position:absolute;
+      left:50%;
+      top:85px;
+      transform: translateX(-50%);
+    }
+
+    /* Clip 2 button */
+    #loveTooBtn{
+      margin-top: 10px;
+    }
+
+    /* Progress dots */
+    .dots{
+      display:flex;
+      justify-content:center;
+      gap:8px;
+      margin-top:12px;
+    }
+    .dot{
+      width:10px; height:10px;
+      border-radius:50%;
+      background: rgba(0,0,0,0.12);
+      transition: all .25s ease;
+    }
+    .dot.on{
+      background:#ff4d6d;
+      transform: scale(1.2);
+    }
+
+    /* Floating hearts */
+    .heart{
+      position:fixed;
+      bottom:-20px;
+      font-size:20px;
+      animation: float 4s linear infinite;
+      pointer-events:none;
+    }
+    @keyframes float{
+      from{ transform:translateY(0); opacity:1; }
+      to{ transform:translateY(-110vh); opacity:0; }
+    }
+
+    /* Mini stickers (inside stage) */
+    .mini{
+      position:absolute;
+      font-size:22px;
+      opacity:.95;
+      animation: miniFly 1.4s ease forwards;
+      pointer-events:none;
+      filter: drop-shadow(0 10px 14px rgba(0,0,0,.10));
+    }
+    @keyframes miniFly{
+      0%{ transform: translateY(20px) scale(.8); opacity:0; }
+      30%{ opacity:1; }
+      100%{ transform: translateY(-170px) rotate(25deg) scale(1); opacity:0; }
+    }
+
+    /* Music overlay */
+    .musicOverlay{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,0.25);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:20px;
+      z-index:999;
+      backdrop-filter: blur(6px);
+    }
+    .musicBox{
+      width:min(420px, calc(100% - 32px));
+      background:#fff;
+      border-radius:24px;
+      padding:20px 18px;
+      text-align:center;
+      box-shadow:0 20px 45px rgba(0,0,0,0.2);
+      animation: stickerPop .7s ease both;
+    }
+    .musicTitle{
+      font-size:18px;
+      font-weight:950;
+      color:#ff4d6d;
+      margin-bottom:6px;
+    }
+    .musicText{
+      font-size:13px;
+      color:#444;
+      margin-bottom:14px;
+      line-height:1.3;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="musicOverlay" id="musicOverlay">
+    <div class="musicBox">
+      <div class="musicTitle">Enable romantic piano? 🎹💗</div>
+      <div class="musicText">
+        Tap once to start a soft piano instrumental (offline).
+      </div>
+      <button class="primary" id="playMusicBtn">PLAY PIANO 💖</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="top">
+      <div class="badge" id="badge">CLIP 1 / 3</div>
+    </div>
+
+    <div class="stage" id="stage">
+
+      <!-- CLIP 1 -->
+      <div class="scene active" id="scene1">
+        <div class="sticker">💘🐻</div>
+        <div class="title">WILL YOU BE<br>MY VALENTINE</div>
+        <div class="subtitle">Choose wisely 😏✨</div>
+
+        <div class="btnRow" id="clip1Row">
+          <button class="primary" id="yesBtn">YES 💖</button>
+          <button class="ghost" id="noBtn">NO 😭</button>
+        </div>
+      </div>
+
+      <!-- CLIP 2 -->
+      <div class="scene" id="scene2">
+        <button class="backBtn" id="back2">⬅ BACK</button>
+
+        <div class="sticker pulse">🥰🐱</div>
+        <div class="title">I LOVE YOU<br>AYUNDA</div>
+        <div class="subtitle">Now say it back 😳💞</div>
+
+        <button class="primary" id="loveTooBtn">I LOVE YOU TOO 💝</button>
+      </div>
+
+      <!-- CLIP 3 -->
+      <div class="scene" id="scene3">
+        <button class="backBtn" id="back3">⬅ BACK</button>
+
+        <div class="sticker pulse">💝🧸</div>
+        <div class="title">HAPPY VALENTINE<br>MY LOVE</div>
+        <div class="subtitle">You just made my day 🥹✨</div>
+      </div>
+
+    </div>
+
+    <div class="dots">
+      <div class="dot on" id="d1"></div>
+      <div class="dot" id="d2"></div>
+      <div class="dot" id="d3"></div>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================
+       ROMANTIC PIANO (WebAudio)
+       ========================================================= */
+    let audioCtx, masterGain, isPlaying = false;
+    let bpm = 78;
+    let interval;
+    let step = 0;
+
+    function initAudio(){
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = 0.22;
+      masterGain.connect(audioCtx.destination);
+    }
+
+    function playPiano(freq, duration=0.6, volume=0.18){
+      const now = audioCtx.currentTime;
+
+      const out = audioCtx.createGain();
+      out.gain.value = 0;
+      out.connect(masterGain);
+
+      out.gain.linearRampToValueAtTime(volume, now + 0.01);
+      out.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.value = 2800;
+      filter.Q.value = 0.7;
+      filter.connect(out);
+
+      const harmonics = [
+        { mul: 1,   type: "sine",     gain: 1.0 },
+        { mul: 2,   type: "sine",     gain: 0.20 },
+        { mul: 3,   type: "triangle", gain: 0.12 },
+        { mul: 4,   type: "sine",     gain: 0.06 }
+      ];
+
+      harmonics.forEach(h => {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = h.type;
+        osc.frequency.value = freq * h.mul;
+        g.gain.value = h.gain;
+        osc.connect(g);
+        g.connect(filter);
+        osc.start(now);
+        osc.stop(now + duration);
+      });
+    }
+
+    const chords = [
+      [261.63, 329.63, 392.00], // C
+      [196.00, 246.94, 293.66], // G
+      [220.00, 261.63, 329.63], // Am
+      [174.61, 220.00, 261.63]  // F
+    ];
+
+    const melody = [
+      392.00, 440.00, 392.00, 329.63,
+      349.23, 392.00, 440.00, 392.00,
+      329.63, 349.23, 392.00, 329.63,
+      293.66, 329.63, 349.23, 261.63
+    ];
+
+    function startPiano(){
+      if(!audioCtx) initAudio();
+      if(audioCtx.state === "suspended") audioCtx.resume();
+      if(isPlaying) return;
+
+      isPlaying = true;
+      const msPerBeat = (60 / bpm) * 1000;
+
+      interval = setInterval(() => {
+        const chordIndex = Math.floor(step / 4) % chords.length;
+        const chord = chords[chordIndex];
+
+        if(step % 4 === 0 || step % 4 === 2){
+          playPiano(chord[0] / 2, 0.85, 0.11);
+        }
+
+        if(step % 4 === 0){
+          chord.forEach((f) => playPiano(f, 0.9, 0.07));
+        }
+
+        const m = melody[step % melody.length];
+        playPiano(m, 0.55, 0.09);
+
+        step++;
+      }, msPerBeat);
+    }
+
+    const musicOverlay = document.getElementById("musicOverlay");
+    document.getElementById("playMusicBtn").addEventListener("click", () => {
+      startPiano();
+      musicOverlay.style.display = "none";
+    });
+
+    /* =========================================================
+       CLIPS LOGIC
+       ========================================================= */
+    const stage = document.getElementById("stage");
+
+    const scenes = [
+      document.getElementById("scene1"),
+      document.getElementById("scene2"),
+      document.getElementById("scene3")
+    ];
+
+    const dots = [
+      document.getElementById("d1"),
+      document.getElementById("d2"),
+      document.getElementById("d3")
+    ];
+
+    const badge = document.getElementById("badge");
+
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const clip1Row = document.getElementById("clip1Row");
+
+    const loveTooBtn = document.getElementById("loveTooBtn");
+
+    const back2 = document.getElementById("back2");
+    const back3 = document.getElementById("back3");
+
+    let idx = 0;
+
+    function setScene(i){
+      idx = Math.max(0, Math.min(2, i));
+      scenes.forEach((s, k) => s.classList.toggle("active", k === idx));
+      dots.forEach((d, k) => d.classList.toggle("on", k === idx));
+      badge.innerText = `CLIP ${idx + 1} / 3`;
+
+      burstMiniStickers(18);
+      spawnHearts(10);
+
+      if(idx === 2){
+        spawnHearts(30);
+        burstMiniStickers(26);
+      }
+    }
+
+    // Clip 1: NO runs away
+    function moveNoButton(){
+      const rowRect = clip1Row.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+
+      const padding = 8;
+      const maxX = rowRect.width - btnRect.width - padding;
+      const maxY = rowRect.height - btnRect.height - padding;
+
+      const x = Math.random() * maxX + padding;
+      const y = Math.random() * maxY + padding;
+
+      noBtn.style.left = x + "px";
+      noBtn.style.top = y + "px";
+      noBtn.style.transform = "translate(0,0)";
+    }
+
+    noBtn.addEventListener("mouseenter", moveNoButton);
+    noBtn.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      moveNoButton();
+    }, { passive:false });
+    noBtn.addEventListener("click", moveNoButton);
+
+    // Navigation
+    yesBtn.addEventListener("click", () => setScene(1));
+    loveTooBtn.addEventListener("click", () => setScene(2));
+
+    back2.addEventListener("click", () => setScene(0));
+    back3.addEventListener("click", () => setScene(1));
+
+    // Cute stickers list
+    const cuteStickers = ["💖","💘","💝","✨","🥰","🐻","🐱","🌸","🍓","🧋","🎀","🌷","🫶","😚","😍"];
+
+    function spawnHearts(n=12){
+      for(let i=0;i<n;i++){
+        const h = document.createElement("div");
+        h.className = "heart";
+        h.innerText = Math.random() > 0.5 ? "💖" : "💘";
+        h.style.left = (Math.random() * 100) + "vw";
+        h.style.animationDuration = (2 + Math.random() * 3) + "s";
+        document.body.appendChild(h);
+        setTimeout(() => h.remove(), 5200);
+      }
+    }
+
+    function burstMiniStickers(count=14){
+      for(let i=0;i<count;i++){
+        const m = document.createElement("div");
+        m.className = "mini";
+        m.innerText = cuteStickers[Math.floor(Math.random() * cuteStickers.length)];
+        m.style.left = (Math.random() * 100) + "%";
+        m.style.bottom = (10 + Math.random() * 25) + "px";
+        m.style.animationDuration = (1.0 + Math.random() * 1.0) + "s";
+        stage.appendChild(m);
+        setTimeout(() => m.remove(), 1900);
+      }
+    }
+
+    // Start effects
+    setTimeout(moveNoButton, 250);
+    spawnHearts(14);
+    burstMiniStickers(18);
+  </script>
+</body>
+</html>
